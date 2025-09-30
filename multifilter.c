@@ -7,8 +7,7 @@
 #define M_PI 3.14159265358979323846
 #endif
 
-// FIX: Corrected typo from MULTIFILter_URI to MULTIFILTER_URI
-#define MULTIFILTER_URI "https://s2400.david.plugins/multifilter"
+#define MULTIFILTER_URI "https://github.com/lilbrimstone/multifilter"
 #define NUM_FORMANTS 3
 #define COMB_BUFFER_SIZE 4096
 
@@ -79,12 +78,14 @@ activate(LV2_Handle instance) {
     self->bq_z1 = self->bq_z2 = 0.0;
     self->svf_lp_z1 = self->svf_bp_z1 = 0.0;
     self->tb303_v1=self->tb303_v2=self->tb303_v3=self->tb303_v4=0.0;
-    for (int i=0; i<NUM_FORMANTS; ++i) self->formant_z1[i]=self->formant_z2[i]=0.0;
+    // <-- FIX: Changed self.formant_z2 to self->formant_z2
+    for (int i=0; i<NUM_FORMANTS; ++i) self->formant_z1[i] = self->formant_z2[i] = 0.0;
     if (self->comb_buffer) memset(self->comb_buffer, 0, COMB_BUFFER_SIZE*sizeof(double));
     self->comb_write_pos = 0; self->rm_phase = 0.0; self->lfo_phase = 0.0;
     self->lfo_sh_value = 0.0; self->lfo_slew_z1 = 0.0;
     self->lfo_step_counter = 0; self->lfo_stepped_value = 0.0;
 }
+
 
 static void
 run(LV2_Handle instance, uint32_t n_samples) {

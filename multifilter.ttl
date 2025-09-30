@@ -4,12 +4,15 @@
 @prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix pprops: <http://lv2plug.in/ns/ext/port-props#> .
 
-<https://s2400.david.plugins/multifilter>
+# <-- CHANGED URI to match GitHub repository
+<https://github.com/lilbrimstone/multifilter>
     a lv2:Plugin, lv2:FilterPlugin ;
-    doap:name "MultiFilter" ;
+    # <-- CHANGED doap:name for correct S2400 vendor parsing
+    doap:name "LilBrimstone MultiFilter" ;
     lv2:binary <multifilter.so> ;
     doap:license <http://opensource.org/licenses/ISC> ;
-    doap:developer [ doap:name "Dave" ] ;
+    # <-- CHANGED developer name
+    doap:developer [ doap:name "LilBrimstone" ] ;
 
     lv2:port [
         a lv2:AudioPort, lv2:InputPort ;
