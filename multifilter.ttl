@@ -1,0 +1,139 @@
+@prefix lv2:    <http://lv2plug.in/ns/lv2core#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix doap:   <http://usefulinc.com/ns/doap#> .
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix pprops: <http://lv2plug.in/ns/ext/port-props#> .
+
+<https://s2400.david.plugins/multifilter>
+    a lv2:Plugin, lv2:FilterPlugin ;
+    doap:name "MultiFilter" ;
+    lv2:binary <multifilter.so> ;
+    doap:license <http://opensource.org/licenses/ISC> ;
+    doap:developer [ doap:name "Dave" ] ;
+
+    lv2:port [
+        a lv2:AudioPort, lv2:InputPort ;
+        lv2:index 0 ;
+        lv2:symbol "in_l" ;
+        lv2:name "In L"
+    ], [
+        a lv2:AudioPort, lv2:OutputPort ;
+        lv2:index 1 ;
+        lv2:symbol "out_l" ;
+        lv2:name "Out L"
+    ], [
+        a lv2:AudioPort, lv2:OutputPort ;
+        lv2:index 2 ;
+        lv2:symbol "out_r" ;
+        lv2:name "Out R"
+    ], [
+        a lv2:ControlPort, lv2:InputPort ;
+        lv2:index 3 ;
+        lv2:symbol "cutoff" ;
+        lv2:name "Cutoff" ;
+        lv2:default 1000.0 ;
+        lv2:minimum 20.0 ;
+        lv2:maximum 18000.0 ;
+        lv2:portProperty pprops:logarithmic
+    ], [
+        a lv2:ControlPort, lv2:InputPort ;
+        lv2:index 4 ;
+        lv2:symbol "resonance" ;
+        lv2:name "Resonance" ;
+        lv2:default 1.0 ;
+        lv2:minimum 0.707 ;
+        lv2:maximum 20.0
+    ], [
+        a lv2:ControlPort, lv2:InputPort ;
+        lv2:index 5 ;
+        lv2:symbol "mix" ;
+        lv2:name "Mix" ;
+        lv2:default 1.0 ;
+        lv2:minimum 0.0 ;
+        lv2:maximum 1.0
+    ], [
+        a lv2:ControlPort, lv2:InputPort ;
+        lv2:portProperty lv2:integer, lv2:enumeration ;
+        lv2:index 6 ;
+        lv2:symbol "filter_type" ;
+        lv2:name "Filter Type" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 5 ;
+        lv2:scalePoint [ rdfs:label "Biquad 12dB" ; rdf:value 0 ] ;
+        lv2:scalePoint [ rdfs:label "SEM 12dB" ; rdf:value 1 ] ;
+        lv2:scalePoint [ rdfs:label "Acid 303" ; rdf:value 2 ] ;
+        lv2:scalePoint [ rdfs:label "Vowel" ; rdf:value 3 ] ;
+        lv2:scalePoint [ rdfs:label "Comb" ; rdf:value 4 ] ;
+        lv2:scalePoint [ rdfs:label "Ring Mod" ; rdf:value 5 ]
+    ], [
+        a lv2:ControlPort, lv2:InputPort ;
+        lv2:portProperty lv2:integer, lv2:enumeration ;
+        lv2:index 7 ;
+        lv2:symbol "vowel_select" ;
+        lv2:name "Vowel" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 4 ;
+        lv2:scalePoint [ rdfs:label "A (aah)" ; rdf:value 0 ] ;
+        lv2:scalePoint [ rdfs:label "E (eee)" ; rdf:value 1 ] ;
+        lv2:scalePoint [ rdfs:label "I (iii)" ; rdf:value 2 ] ;
+        lv2:scalePoint [ rdfs:label "O (ooh)" ; rdf:value 3 ] ;
+        lv2:scalePoint [ rdfs:label "U (uuu)" ; rdf:value 4 ]
+    ], [
+        a lv2:ControlPort, lv2:InputPort ;
+        lv2:index 8 ;
+        lv2:symbol "lfo_rate" ;
+        lv2:name "LFO Rate" ;
+        lv2:default 2.0 ;
+        lv2:minimum 0.05 ;
+        lv2:maximum 50.0 ;
+        lv2:portProperty pprops:logarithmic
+    ], [
+        a lv2:ControlPort, lv2:InputPort ;
+        lv2:portProperty lv2:integer, lv2:enumeration ;
+        lv2:index 9 ;
+        lv2:symbol "lfo_shape" ;
+        lv2:name "LFO Shape" ;
+        lv2:default 0 ;
+        lv2:minimum 0 ;
+        lv2:maximum 5 ;
+        lv2:scalePoint [ rdfs:label "Sine" ; rdf:value 0 ] ;
+        lv2:scalePoint [ rdfs:label "Triangle" ; rdf:value 1 ] ;
+        lv2:scalePoint [ rdfs:label "Ramp Up" ; rdf:value 2 ] ;
+        lv2:scalePoint [ rdfs:label "Ramp Down" ; rdf:value 3 ] ;
+        lv2:scalePoint [ rdfs:label "Square" ; rdf:value 4 ] ;
+        lv2:scalePoint [ rdfs:label "S&H" ; rdf:value 5 ]
+    ], [
+        a lv2:ControlPort, lv2:InputPort ;
+        lv2:index 10 ;
+        lv2:symbol "cutoff_mod" ;
+        lv2:name "Cutoff Mod" ;
+        lv2:default 0.0 ;
+        lv2:minimum 0.0 ;
+        lv2:maximum 10000.0
+    ], [
+        a lv2:ControlPort, lv2:InputPort ;
+        lv2:index 11 ;
+        lv2:symbol "res_mod" ;
+        lv2:name "Reso Mod" ;
+        lv2:default 0.0 ;
+        lv2:minimum 0.0 ;
+        lv2:maximum 20.0
+    ], [
+        a lv2:ControlPort, lv2:InputPort ;
+        lv2:index 12 ;
+        lv2:symbol "lfo_slew" ;
+        lv2:name "LFO Slew" ;
+        lv2:default 0.0 ;
+        lv2:minimum 0.0 ;
+        lv2:maximum 1.0
+    ], [
+        a lv2:ControlPort, lv2:InputPort ;
+        lv2:index 13 ;
+        lv2:symbol "lfo_steps" ;
+        lv2:name "LFO Steps" ;
+        lv2:default 0.0 ;
+        lv2:minimum 0.0 ;
+        lv2:maximum 1.0
+    ] .
