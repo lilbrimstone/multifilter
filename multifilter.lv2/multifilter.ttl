@@ -4,12 +4,12 @@
 @prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix pprops: <http://lv2plug.in/ns/ext/port-props#> .
 
-<https://s2400.david.plugins/multifilter>
+<https://github.com/lilbrimstone/multifilter>
     a lv2:Plugin, lv2:FilterPlugin ;
-    doap:name "MultiFilter" ;
+    doap:name "LilBrimstone MultiFilter" ;
     lv2:binary <multifilter.so> ;
     doap:license <http://opensource.org/licenses/ISC> ;
-    doap:developer [ doap:name "Dave" ] ;
+    doap:developer [ doap:name "LilBrimstone" ] ;
 
     lv2:port [
         a lv2:AudioPort, lv2:InputPort ;

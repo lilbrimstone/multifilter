@@ -1,60 +1,64 @@
-# Makefile for the MultiFilter LV2 Plugin
+# Makefile for LilBrimstone MultiFilter LV2 Plugin
 
-# The name of the plugin, used for source, target, and bundle names
-BUNDLE_NAME = multifilter
+# --- Configuration ---
+# The name of your plugin (used for .so, .lv2 folder, etc.)
+PLUGIN_NAME := multifilter
 
-# Standard LV2 installation path (optional, for system-wide install)
-PREFIX ?= /usr/lib
-LV2_DIR = $(PREFIX)/lv2
+# The directory containing your source files
+SRC_DIR := src
 
-# --- Cross-compilation settings for S2400 (aarch64) ---
-CC = aarch64-linux-gnu-gcc
-# Set the PKG_CONFIG_PATH to find the aarch64 lv2-core libraries
-export PKG_CONFIG_PATH = /usr/lib/aarch64-linux-gnu/pkgconfig
+# The name of the LV2 bundle that will be created
+BUNDLE_NAME := $(PLUGIN_NAME).lv2
 
-# Compiler flags: -g for debugging, -Wall/-Wextra for all warnings,
-# -O2 for optimization, -fPIC for position-independent code.
-CFLAGS = -g -Wall -Wextra -O2 -fPIC `pkg-config --cflags lv2-core`
-LDFLAGS = -shared
+# --- Compiler and Flags ---
+CC := aarch64-linux-gnu-gcc
+CFLAGS := -O3 -fPIC -shared -Wall -Wextra -I.
+PKG_CONFIG := aarch64-linux-gnu-pkg-config
+LV2_CFLAGS := $(shell $(PKG_CONFIG) --cflags lv2-plugin)
+LV2_LIBS := $(shell $(PKG_CONFIG) --libs lv2-plugin)
 
-# --- File and Directory Definitions ---
-BUNDLE_DIR  = $(BUNDLE_NAME).lv2
-TARGET_SO   = $(BUNDLE_NAME).so
-SRC_C       = $(BUNDLE_NAME).c
-TTL_MAIN    = $(BUNDLE_NAME).ttl
-TTL_MANIF   = manifest.ttl
+# --- Files ---
+# Source files are now read from the SRC_DIR
+C_SRC := $(SRC_DIR)/$(PLUGIN_NAME).c
+TTL_SRC := $(SRC_DIR)/$(PLUGIN_NAME).ttl
+MANIFEST_SRC := $(SRC_DIR)/manifest.ttl
 
-# --- Build Targets ---
+# Destination files are in the BUNDLE_NAME directory
+SO_DEST := $(BUNDLE_NAME)/$(PLUGIN_NAME).so
+TTL_DEST := $(BUNDLE_NAME)/$(PLUGIN_NAME).ttl
+MANIFEST_DEST := $(BUNDLE_NAME)/manifest.ttl
 
-# Default target: build the complete LV2 bundle
-all: $(BUNDLE_DIR)/$(TARGET_SO)
+# --- Rules ---
+.PHONY: all clean install
 
-# Rule to build the .so and create the bundle
-$(BUNDLE_DIR)/$(TARGET_SO): $(SRC_C) $(TTL_MAIN) $(TTL_MANIF)
-	@echo "--- Compiling $(SRC_C) for aarch64 ---"
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $(TARGET_SO) $(SRC_C)
-	
-	@echo "--- Creating LV2 Bundle: $(BUNDLE_DIR) ---"
-	mkdir -p $(BUNDLE_DIR)
-	mv $(TARGET_SO) $(BUNDLE_DIR)/
-	cp $(TTL_MANIF) $(BUNDLE_DIR)/
-	cp $(TTL_MAIN) $(BUNDLE_DIR)/
-	@echo "--- Build complete. ---"
+# Default rule: build everything
+all: $(SO_DEST) $(TTL_DEST) $(MANIFEST_DEST)
 
-# Clean up all generated files
+# Rule to build the .so file
+$(SO_DEST): $(C_SRC) | $(BUNDLE_NAME)
+	$(CC) $(CFLAGS) $(LV2_CFLAGS) -o $@ $< $(LV2_LIBS)
+	@echo "Compiled:" $@
+
+# Rule to copy the main .ttl file
+$(TTL_DEST): $(TTL_SRC) | $(BUNDLE_NAME)
+	@cp $< $@
+	@echo "Copied TTL:" $@
+
+# Rule to copy the manifest.ttl file
+$(MANIFEST_DEST): $(MANIFEST_SRC) | $(BUNDLE_NAME)
+	@cp $< $@
+	@echo "Copied Manifest:" $@
+
+# Rule to create the bundle directory if it doesn't exist
+$(BUNDLE_NAME):
+	@mkdir -p $@
+
+# Rule to clean up build artifacts
 clean:
-	@echo "--- Cleaning up build files ---"
-	rm -rf $(BUNDLE_DIR)
-	rm -f $(TARGET_SO)
+	@rm -rf $(BUNDLE_NAME)
+	@echo "Cleaned build artifacts."
 
-# Install to system directory (optional)
+# Rule to install to S2400 (optional)
 install: all
-	mkdir -p $(DESTDIR)$(LV2_DIR)
-	cp -r $(BUNDLE_DIR) $(DESTDIR)$(LV2_DIR)
-
-# Uninstall from system directory (optional)
-uninstall:
-	rm -rf $(DESTDIR)$(LV2_DIR)/$(BUNDLE_DIR)
-
-# Phony targets are not files
-.PHONY: all clean install uninstall
+	@cp -r $(BUNDLE_NAME) /mnt/s2400/lv2/
+	@echo "Installed $(BUNDLE_NAME) to S2400."
