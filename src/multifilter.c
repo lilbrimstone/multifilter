@@ -43,6 +43,11 @@ typedef struct {
 
 static LV2_Handle
 instantiate(const LV2_Descriptor* d, double rate, const char* path, const LV2_Feature* const* f) {
+    // Silence unused parameter warnings
+    (void)d;
+    (void)path;
+    (void)f;
+
     MultiFilter* self = calloc(1, sizeof(MultiFilter));
     if (!self) return NULL;
     self->sample_rate = rate;
@@ -78,7 +83,6 @@ activate(LV2_Handle instance) {
     self->bq_z1 = self->bq_z2 = 0.0;
     self->svf_lp_z1 = self->svf_bp_z1 = 0.0;
     self->tb303_v1=self->tb303_v2=self->tb303_v3=self->tb303_v4=0.0;
-    // <-- FIX: Changed self.formant_z2 to self->formant_z2
     for (int i=0; i<NUM_FORMANTS; ++i) self->formant_z1[i] = self->formant_z2[i] = 0.0;
     if (self->comb_buffer) memset(self->comb_buffer, 0, COMB_BUFFER_SIZE*sizeof(double));
     self->comb_write_pos = 0; self->rm_phase = 0.0; self->lfo_phase = 0.0;
@@ -173,7 +177,13 @@ run(LV2_Handle instance, uint32_t n_samples) {
             wet=total_out*gain_comp;
         } else if (filter_type == 4) { // Comb
             double delay_samps=self->sample_rate/modulated_cutoff;
-            if(delay_samps>=COMB_BUFFER_SIZE-1)delay_samps=COMB_BUFFER_SIZE-1;if(delay_samps<1.0)delay_samps=1.0;
+            // Corrected logic for clamping delay_samps
+            if (delay_samps >= COMB_BUFFER_SIZE - 1) {
+                delay_samps = COMB_BUFFER_SIZE - 1;
+            }
+            if (delay_samps < 1.0) {
+                delay_samps = 1.0;
+            }
             double norm_res=(modulated_res-0.707)/19.293,feedback=norm_res*0.99;
             double read_pos_f=self->comb_write_pos-delay_samps;
             int read_pos_i1=(int)floor(read_pos_f),read_pos_i2=read_pos_i1+1;double frac=read_pos_f-read_pos_i1;
@@ -196,7 +206,10 @@ run(LV2_Handle instance, uint32_t n_samples) {
 }
 
 static void
-deactivate(LV2_Handle instance) {}
+deactivate(LV2_Handle instance) {
+    // Silence unused parameter warning
+    (void)instance;
+}
 
 static void
 cleanup(LV2_Handle instance) {
